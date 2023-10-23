@@ -1,0 +1,10 @@
+---
+title: "index"
+date: "2023-10-23"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# index

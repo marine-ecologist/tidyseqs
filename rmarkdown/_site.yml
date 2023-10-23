@@ -1,0 +1,22 @@
+---
+name: "tidyseqs"
+output_dir: "../docs/"
+navbar:
+  title: "tidyseqs"
+  type: default
+  href: "index.html"
+  left:
+  - text: "Workflow"
+    href: tidyseqs_workflow.html
+
+
+output:
+  html_document:
+    css: tidyseqs.css
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    code_folding: show
+    fig_caption: true
+---

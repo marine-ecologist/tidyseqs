@@ -9,8 +9,9 @@
 #' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 
 
-plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet = NULL) {
+plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet = NULL, ...) {
 
+  folder=folder_path
 
   ### update order by dissimilarity index
 
@@ -87,7 +88,7 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
 
   # get colors
   colour.seqs_new <- extract_plot_colors(folder)
-  filtered_color_list <- color_list[names(color_list) %in% input$seq.ID]
+  #filtered_color_list <- color_list[names(color_list) %in% input$seq.ID]
 
   p <-
     ggplot2::ggplot(
@@ -128,12 +129,12 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
 
     create_facet_column <- function(df, n) {
       df %>%
-        group_by(sample_name) %>%
-        summarise() %>%
-        mutate(rn = row_number()) %>%
+        dplyr::group_by(sample_name) %>%
+        dplyr::summarise() %>%
+        dplyr::mutate(rn = dplyr::row_number()) %>%
         #select(-facet_column) %>%
-        mutate(facet_column = letters[ceiling(rn / (nrow(.) / n))]) %>%
-        right_join(df, by = "sample_name")
+        dplyr::mutate(facet_column = letters[ceiling(rn / (nrow(.) / n))]) %>%
+        dplyr::right_join(df, by = "sample_name")
     }
 
     input <- create_facet_column(input, nrow)
@@ -149,14 +150,15 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
       ggplot2::xlab("") +
       ggplot2::ylab("") +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-      ggplot2::facet_wrap(~ facet_column, nrow=nrow, scales = "free_x") + xlab("")
-  }
+      ggplot2::facet_wrap(~ facet_column, nrow=nrow, scales = "free_x") +
+      ggplot2::theme(panel.spacing = unit(2, "cm", data = NULL))
+    }
 
 
   #--------------------------------------------#
   if (!is.null(facet)) {
     p <- p +
-      ggplot2::facet_wrap(~ get(facet), scales = "free_x") + xlab("")
+      ggplot2::facet_wrap(~ get(facet), scales = "free_x") + ggplot2::xlab("")
   }
   #--------------------------------------------#
 
@@ -167,7 +169,7 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
 
   } else if (type == "plotly") {
 
-    p <- plotly::ggplotly(p) %>% plotly::layout( margin = list(l = 50, r = 50))
+    p <- plotly::ggplotly(p) %>% plotly::layout(height = p$plotHeight, autosize=TRUE, margin = list(l = 100, r = 100))
 
     return(p)
 

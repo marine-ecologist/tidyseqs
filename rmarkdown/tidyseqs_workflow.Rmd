@@ -146,7 +146,7 @@ if you include metadata in extract_seqs, you can use any tidyverse filter() acti
 
 ```{r}
 
-sequences <- extract_seqs(folder_path, meta_sim) %>%
+sequences <- extract_seqs(folder=folder_path, metadata=meta_sim) %>%
              filter(host_genera=="Pocillopora") %>%
              filter(location=="Den Haag") %>% 
              filter(latitude < -25)
@@ -257,7 +257,7 @@ cluster samples by either "bray-curtis", "euclidean", "jaccard", "hellinger", sa
 
 
 plot_data <- extract_seqs(folder_path, meta_sim) |>
-             filter_seqs(threshold = 5000) |> 
+             filter_seqs(threshold = 1000) |> 
              filter_seqs(keep_samples = "AU18_02") |> 
              plot_seqs(type="ggplot", cluster="hellinger")
 
@@ -299,11 +299,11 @@ plot_data
 
 Split a large dataset using nrow (note: can't be used with facet)
 
-```{r}
-
-plot_data <- extract_seqs(folder_path, meta_sim) |>
-             filter_seqs(threshold = 2000) |> 
-             plot_seqs(type="plotly", cluster="hellinger", nrow=3) 
+```{r, fig.height=18, fig.width=12}
+  
+plot_data <- extract_seqs(folder=folder_path, meta_sim) %>%
+             filter_seqs(threshold = 2000) %>%
+             plot_seqs(type="plotly", cluster="hellinger", nrow=4) 
 
 plot_data
 

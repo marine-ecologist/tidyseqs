@@ -24,7 +24,7 @@ extract_seqs(
 \item{factors}{option to include a vector list of column names, e.g: c("location", "latitude") to not import every column in a metadata file, if left NULL then will import all columns}
 }
 \value{
-A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
+A data.frame of seq.ID (columns) and sample_name (rows) with either relative or absolute abundance of sequences.
 }
 \description{
 same as extract_seqs but in long format

@@ -4,7 +4,15 @@
 \alias{plot_seqs}
 \title{compare_samples}
 \usage{
-plot_seqs(input, type = "ggplot", cluster = "none", nrow = NULL, facet = NULL)
+plot_seqs(
+  input,
+  type = "ggplot",
+  cluster = "none",
+  nrow = NULL,
+  facet = NULL,
+  seq.order = TRUE,
+  ...
+)
 }
 \arguments{
 \item{input1}{first output}

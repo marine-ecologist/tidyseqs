@@ -9,7 +9,7 @@
 #' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 
 
-plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet = NULL, ...) {
+plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet = NULL, seq.order=TRUE, ...) {
 
   folder=folder_path
 
@@ -90,11 +90,32 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
   colour.seqs_new <- extract_plot_colors(folder)
   #filtered_color_list <- color_list[names(color_list) %in% input$seq.ID]
 
+  dominant.seqs <-  input %>%
+    group_by(seq.ID) %>%
+    summarize(max_abundance = max(abundance)) %>%
+    arrange(desc(max_abundance)) %>%
+    pull(seq.ID)
+
+  if(seq.order==TRUE){
+    p <-
+      ggplot2::ggplot(
+        data = input,
+        ggplot2::aes(x = sample_name, y = abundance, fill = factor(seq.ID, levels=dominant.seqs), group = factor(seq.ID, levels=dominant.seqs))
+             ) +
+      ggplot2::scale_y_reverse()
+
+
+  }
+
+  else if(seq.order==FALSE) {
   p <-
     ggplot2::ggplot(
       data = input,
       ggplot2::aes(x = sample_name, y = abundance, fill = seq.ID, group = abundance)
-    ) +
+    )
+  }
+
+  p <- p +
     ggplot2::theme_bw() +
     ggplot2::geom_bar(color = "black", linewidth = 0.1, show.legend = FALSE, stat = "identity") +
     ggplot2::scale_fill_manual(values = colour.seqs_new) +
@@ -139,11 +160,26 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
 
     input <- create_facet_column(input, nrow)
 
-    p <-
-      ggplot2::ggplot(
-        data = input,
-        ggplot2::aes(x = sample_name, y = abundance, fill = seq.ID, group = abundance)
-      ) +
+      if(seq.order==TRUE){
+        p <-
+          ggplot2::ggplot(
+            data = input,
+            ggplot2::aes(x = sample_name, y = abundance, fill = factor(seq.ID, levels=dominant.seqs), group = factor(seq.ID, levels=dominant.seqs))
+          ) +
+          ggplot2::scale_y_reverse()
+
+
+      }
+
+    else if(seq.order==FALSE) {
+      p <-
+        ggplot2::ggplot(
+          data = input,
+          ggplot2::aes(x = sample_name, y = abundance, fill = seq.ID, group = abundance)
+        )
+    }
+
+    p <- p +
       ggplot2::theme_bw() +
       ggplot2::geom_bar(color = "black", linewidth = 0.1, show.legend = FALSE, stat = "identity") +
       ggplot2::scale_fill_manual(values = colour.seqs_new) +

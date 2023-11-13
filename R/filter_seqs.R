@@ -9,6 +9,7 @@
 #' @param drop_samples drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")
 #' @param keep_samples drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")
 #' @param drop_seqs drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")
+#' @param keep_seqs drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")
 #' @param threshold Set threshold to remove samples if less than the threshold (defaults to 1000)
 #' @export
 #' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
@@ -42,9 +43,9 @@ filter_seqs <- function(input, type="relative", drop_samples=NULL, clade = NULL,
   }
 
   # Keep seq.ID by full match
-  if (!is.null(drop_seqs)) {
+  if (!is.null(keep_seqs)) {
     input <- input %>%
-      dplyr::filter(!seq.ID %in% drop_seqs)
+      dplyr::filter(seq.ID %in% keep_seqs)
   }
 
   # Keep seq.ID by full match

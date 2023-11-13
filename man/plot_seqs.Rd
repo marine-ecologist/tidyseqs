@@ -6,6 +6,7 @@
 \usage{
 plot_seqs(
   input,
+  folder,
   type = "ggplot",
   cluster = "none",
   nrow = NULL,

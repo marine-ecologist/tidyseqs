@@ -4,59 +4,91 @@
 #' same as extract_seqs but in long format
 #'
 #' @param input location of input file
-#' @param matchprofiles keep only seq.ID in matching profile?
 #' @param clade filter by single "C" or multiple clades c("C", "D") to filter sequences by
 #' @param drop_samples drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")
 #' @param keep_samples drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")
 #' @param drop_seqs drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")
 #' @param keep_seqs drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")
-#' @param threshold Set threshold to remove samples if less than the threshold (defaults to 1000)
+#' @param keep_profiles keep only seq.ID in matching ITS2 profile
+#' @param drop_profiles keep only seq.ID in matching ITS2 profile
+#' @param threshold Set threshold to remove samples if less than the threshold (defaults to 0)
 #' @export
 #' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 
 
-filter_seqs <- function(input, type="relative", drop_samples=NULL, clade = NULL, keep_samples=NULL, drop_seqs=NULL, keep_seqs=NULL, threshold=0, ...){
+
+filter_seqs <- function(input, folder=NULL, type="relative",
+                        drop_samples=NULL, keep_samples=NULL,
+                        drop_seqs=NULL, keep_seqs=NULL,
+                        keep_profiles=FALSE, drop_profiles=FALSE,
+                        clade = NULL, threshold=0, ...){
 
 
-  # Drop rows by sample name
+  #-------- sample_name --------#
+  # Drop
   if (!is.null(drop_samples)) {
     input <- input %>% as.data.frame() %>%
       dplyr::filter(!grepl(paste(drop_samples, collapse = "|"), sample_name))
   }
 
-  # Drop rows by sample name
+  # Keep
   if (!is.null(keep_samples)) {
     input <- input %>% as.data.frame() %>%
-      dplyr::filter(grepl(paste(keep_samples, collapse = "|"), sample_name))
-  }
-
-  # Keep rows only with the sample names
-  if (!is.null(drop_samples)) {
-    input <- input %>% as.data.frame() %>%
       dplyr::filter(!grepl(paste(drop_samples, collapse = "|"), sample_name))
   }
 
-  # Drop seq.ID by full match
+  #-------- seq.ID --------#
+  # drop
   if (!is.null(drop_seqs)) {
     input <- input %>%
       dplyr::filter(!seq.ID %in% drop_seqs)
   }
 
-  # Keep seq.ID by full match
+  # Keep
   if (!is.null(keep_seqs)) {
     input <- input %>%
       dplyr::filter(seq.ID %in% keep_seqs)
   }
 
-  # Keep seq.ID by full match
+  #-------- profiles --------#
+
+  # Drop profiles
+  if (isTRUE(drop_profiles)) {
+
+    itsprofiles <- extract_its2_profile(folder_path) %>%
+      mutate(seqids = str_split(ITS2.profile.1, pattern = "(?<!\\.)[-/]", n = Inf, simplify = FALSE)) |>
+      pull(seqids) |>
+      unlist() |>
+      unique()
+
+    input <- input %>%
+      dplyr::filter(!seq.ID %in% itsprofiles)
+  }
+
+  # Keep profiles
+  if (isTRUE(keep_profiles)) {
+
+    itsprofiles <- extract_its2_profile(folder_path) %>%
+      mutate(seqids = str_split(ITS2.profile.1, pattern = "(?<!\\.)[-/]", n = Inf, simplify = FALSE)) |>
+      pull(seqids) |>
+      unlist() |>
+      unique()
+
+    input <- input %>%
+      dplyr::filter(seq.ID %in% itsprofiles)
+  }
+
+  #-------- clade --------#
+
   if (!is.null(clade)) {
     input <- input %>%
       dplyr::filter(grepl(clade, seq.ID)) |>
       as.data.frame()
   }
 
-  # filter less than 0
-  if (!threshold==0) {
+  #-------- threshold --------#
+
+   if (!threshold==0) {
 
     precheck <- input |>
       dplyr::group_by(sample_name) |>
@@ -72,34 +104,30 @@ filter_seqs <- function(input, type="relative", drop_samples=NULL, clade = NULL,
 
 
     threshold_list <- input %>%
-      dplyr::group_by(seq.ID) %>%
+      dplyr::group_by(sample_name) %>%
       dplyr::summarize(total_abundance = sum(abundance)) %>%
       dplyr::filter(total_abundance < threshold)
 
     input <- input |>
-      dplyr::filter(!seq.ID %in% threshold_list$seq.ID)
+      dplyr::filter(!sample_name %in% threshold_list$sample_name)
 
   }
 
-    # make relative
-    relative <- input |>
-      dplyr::group_by(sample_name) |>
-      dplyr::mutate(total=sum(abundance, na.rm = TRUE))
+  # convert to relative / absolute abundance
+  absolute <- input
 
-    relative <- relative |>
-      dplyr::mutate(abundance=abundance/total) |>
-      dplyr::select(-total)
+  relative <- input %>%
+    dplyr::group_by(sample_name) %>%
+    dplyr::mutate(total=sum(abundance, na.rm = TRUE)) %>%
+    dplyr::mutate(abundance=abundance/total) %>%
+    dplyr::select(-total)
 
 
-    # return functions:
-    if (type == "absolute") {
-      return(input)
+  #return functions:
+  if (type == "absolute") {
+    return(absolute)
     } else if (type == "relative") {
-      return(relative)
-    }
-
-
-
-return(input)
+    return(relative)
+  }
 
 }

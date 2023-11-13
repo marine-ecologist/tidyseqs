@@ -6,12 +6,15 @@
 \usage{
 filter_seqs(
   input,
+  folder = NULL,
   type = "relative",
   drop_samples = NULL,
-  clade = NULL,
   keep_samples = NULL,
   drop_seqs = NULL,
   keep_seqs = NULL,
+  keep_profiles = FALSE,
+  drop_profiles = FALSE,
+  clade = NULL,
   threshold = 0,
   ...
 )
@@ -21,15 +24,19 @@ filter_seqs(
 
 \item{drop_samples}{drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")}
 
-\item{clade}{filter by single "C" or multiple clades c("C", "D") to filter sequences by}
-
 \item{keep_samples}{drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")}
 
 \item{drop_seqs}{drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")}
 
-\item{threshold}{Set threshold to remove samples if less than the threshold (defaults to 1000)}
+\item{keep_seqs}{drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")}
 
-\item{matchprofiles}{keep only seq.ID in matching profile?}
+\item{keep_profiles}{keep only seq.ID in matching ITS2 profile}
+
+\item{drop_profiles}{keep only seq.ID in matching ITS2 profile}
+
+\item{clade}{filter by single "C" or multiple clades c("C", "D") to filter sequences by}
+
+\item{threshold}{Set threshold to remove samples if less than the threshold (defaults to 0)}
 }
 \value{
 A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.

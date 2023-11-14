@@ -34,7 +34,7 @@ filter_seqs <- function(input, folder=NULL, type="relative",
   # Keep
   if (!is.null(keep_samples)) {
     input <- input %>% as.data.frame() %>%
-      dplyr::filter(!grepl(paste(drop_samples, collapse = "|"), sample_name))
+      dplyr::filter(grepl(paste(drop_samples, collapse = "|"), sample_name))
   }
 
   #-------- seq.ID --------#

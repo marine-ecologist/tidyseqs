@@ -4,7 +4,7 @@
 \alias{compare_samples}
 \title{compare_samples}
 \usage{
-compare_samples(input1, input2)
+compare_samples(input1, input2, silent = FALSE)
 }
 \arguments{
 \item{input1}{first output}

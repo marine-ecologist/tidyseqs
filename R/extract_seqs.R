@@ -33,24 +33,31 @@ extract_seqs <-  function(folder, metadata=NULL, type = "absolute",
   absolute <- full_data
 
   if(silent==FALSE){
-  cat("Number of input samples = ", length(unique(its2_profile$sample_name)), "\n")
+  cat("Number of its2_profile samples = ", length(unique(its2_profile$sample_name)), "\n")
+  cat("Number of input samples = ", length(unique(absolute$sample_name)), "\n")
   }
 
 
   #columns matching "onlyprofile"
   if (isTRUE(onlyprofile)) {
+
+    if(silent==FALSE){
+
+      drop_samples <- absolute %>%
+        dplyr::filter(!full_data$sample_name %in% its2_profile$sample_name) |>
+        dplyr::pull(sample_name)
+
+
+
+    cat("onlyprofile=TRUE\n")
+    cat("its2_profile sample_names removed:\n")
+    print(data.frame(drop_samples))#), sep=" | ")   # show only samples not in onlyprofile
+    }
+
     absolute <- absolute %>%
       dplyr::filter(full_data$sample_name %in% its2_profile$sample_name)
 
-
-    if(silent==FALSE){
-    cat("onlyprofile=TRUE\n")
-    cat("its2_profile sample_names removed:\n")
-    cat(absolute$sample_name[!(absolute$sample_name %in% its2_profile$sample_name)], sep=" | ")   # show only samples not in onlyprofile
-    }
-
   }
-
 
   # tidy
   absolute <- absolute %>%
@@ -66,7 +73,6 @@ extract_seqs <-  function(folder, metadata=NULL, type = "absolute",
     dplyr::select(-row_sum)
 
   # pivot
-
   absolute <- absolute %>%
     tibble::rownames_to_column("sample_name") %>%
     tidyr::pivot_longer(cols = -sample_name, names_to = "seq.ID", values_to = "abundance") %>%

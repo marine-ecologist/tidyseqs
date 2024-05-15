@@ -42,9 +42,19 @@ filter_seqs <- function(input, folder=NULL, type="relative",
   # Handle sequence ID filters
   if (!is.null(drop_seqs)) {
     input <- dplyr::filter(input, !seq.ID %in% drop_seqs)
+
+    if (!is.null(drop_seqs) & silent==FALSE){
+      print(drop_seqs, n=Inf)
+    }
+
   }
   if (!is.null(keep_seqs)) {
     input <- dplyr::filter(input, seq.ID %in% keep_seqs)
+
+    if (!is.null(keep_seqs) & silent==FALSE){
+      print(keep_seqs, n=Inf)
+    }
+
   }
 
   #-------- profiles --------#
@@ -60,6 +70,11 @@ filter_seqs <- function(input, folder=NULL, type="relative",
 
     input <- input %>%
       dplyr::filter(!seq.ID %in% itsprofiles)
+
+    if (isTRUE(drop_profiles) & silent==FALSE){
+      print(itsprofiles, n=Inf)
+    }
+
   }
 
   # Keep profiles
@@ -73,6 +88,12 @@ filter_seqs <- function(input, folder=NULL, type="relative",
 
     input <- input %>%
       dplyr::filter(seq.ID %in% itsprofiles)
+
+    if (isTRUE(keep_profiles) & silent==FALSE){
+      print(itsprofiles, n=Inf)
+    }
+
+
   }
 
   #-------- random_sample_n --------#
@@ -125,8 +146,8 @@ filter_seqs <- function(input, folder=NULL, type="relative",
       dplyr::filter(total_abundance <= threshold) |>
       dplyr::arrange(dplyr::desc(total_abundance))
 
-      if (!threshold==0 & silent==FALSE){
-        print(threshold_list)
+      if (silent==FALSE){
+        print(threshold_list, n=Inf)
       }
 
     # remove samples not in the threshold list:

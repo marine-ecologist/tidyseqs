@@ -4,10 +4,12 @@
 \alias{histo_seq}
 \title{Test function}
 \usage{
-histo_seq(folder, seed)
+histo_seq(folder, random = TRUE, n, seed)
 }
 \arguments{
 \item{folder}{location of the root Symportal output}
+
+\item{n}{subsample sample_names by n}
 
 \item{seed}{value for set.seed}
 }

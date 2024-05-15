@@ -10,9 +10,10 @@ extract_seqs(
   type = "absolute",
   factors = NULL,
   onlyprofile = FALSE,
-  remove_zero = TRUE,
+  names = FALSE,
   arrange = TRUE,
   seed = NULL,
+  silent = TRUE,
   ...
 )
 }
@@ -27,11 +28,11 @@ extract_seqs(
 
 \item{onlyprofile}{TRUE/FALSE return only profiles}
 
-\item{remove_zero}{drop empty rows / columns}
+\item{names}{print names list, FALSE by default}
 
 \item{arrange}{arrange by seq.ID alphanumerically, TRUE by default}
 
-\item{seed}{value for set.seed}
+\item{silent}{print summary statistics, FALSE by default}
 }
 \value{
 A data.frame of seq.ID (columns) and sample_name (rows) with either relative or absolute abundance of sequences.

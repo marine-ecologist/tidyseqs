@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_seqs.R
 \name{filter_seqs}
 \alias{filter_seqs}
-\title{Function to extract sequences from symportal output}
+\title{Function to extract sequences from symportal output in long format}
 \usage{
 filter_seqs(
   input,
@@ -15,35 +15,44 @@ filter_seqs(
   keep_profiles = FALSE,
   drop_profiles = FALSE,
   random_sample_n = NULL,
+  silent = TRUE,
   clade = NULL,
   threshold = 0,
   ...
 )
 }
 \arguments{
-\item{input}{location of input file}
+\item{input}{Input data.frame with seq.ID and sample_name}
 
-\item{drop_samples}{drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")}
+\item{folder}{Optional, folder containing profile information}
 
-\item{keep_samples}{drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")}
+\item{type}{"relative" or "absolute" to specify type of abundance to return}
 
-\item{drop_seqs}{drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")}
+\item{drop_samples}{Vector of samples to exclude by name or pattern}
 
-\item{keep_seqs}{drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")}
+\item{keep_samples}{Vector of samples to include by name or pattern}
 
-\item{keep_profiles}{keep only seq.ID in matching ITS2 profile}
+\item{drop_seqs}{Vector of sequences to exclude by name or pattern}
 
-\item{drop_profiles}{keep only seq.ID in matching ITS2 profile}
+\item{keep_seqs}{Vector of sequences to include by name or pattern}
 
-\item{random_sample_n}{take a random sample of n sample_names}
+\item{keep_profiles}{Logical, whether to keep only sequences in matching ITS2 profile}
 
-\item{clade}{filter by single "C" or multiple clades c("C", "D") to filter sequences by}
+\item{drop_profiles}{Logical, whether to exclude sequences in matching ITS2 profile}
 
-\item{threshold}{Set threshold to remove samples if less than the threshold (defaults to 0)}
+\item{random_sample_n}{Integer, number of random samples to select}
+
+\item{silent}{Print messages}
+
+\item{clade}{Vector of clades to filter sequences by (e.g., clade=C, clade=("C", "D"))}
+
+\item{threshold}{Numeric, threshold to remove samples with lower total abundance}
+
+\item{seed}{Optional, seed value for random sampling}
 }
 \value{
-A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
+A data.frame of seq.ID (columns) and sample.ID (rows) with abundance
 }
 \description{
-same as extract_seqs but in long format
+Function to extract sequences from symportal output in long format
 }

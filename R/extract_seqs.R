@@ -1,17 +1,23 @@
 #' Function to extract sequences from symportal output
 #'
 #'
-#' same as extract_seqs but in long format
+#' extract sequences from symportal output
 #'
 #' @param folder location of the root Symportal output
 #' @param type returns either "relative" or "absolute"
 #' @param metadata location of a metadata file in csv, must contain a column called sample_name with matches
 #' @param factors option to include a vector list of column names, e.g: c("location", "latitude") to not import every column in a metadata file, if left NULL then will import all columns
+#' @param onlyprofile TRUE/FALSE return only profiles
+#' @param arrange arrange by seq.ID alphanumerically, TRUE by default
+#' @param silent print summary statistics, FALSE by default
+#' @param names print names list, FALSE by default
 #' @export
 #' @return A data.frame of seq.ID (columns) and sample_name (rows) with either relative or absolute abundance of sequences.
 
 
-extract_seqs <-  function(folder, metadata=NULL, type = "absolute", factors=NULL, onlyprofile=FALSE, remove_zero=TRUE, ...) {
+extract_seqs <-  function(folder, metadata=NULL, type = "absolute",
+                          factors=NULL, onlyprofile=FALSE, names=FALSE,
+                          arrange=TRUE, seed=NULL,  silent=TRUE, ...) {
 
   # read absolute abundances:
   file_list <- list.files(path = folder, pattern = "seqs.absolute.abund_and_meta.txt", include.dirs = TRUE, recursive = TRUE)
@@ -22,16 +28,27 @@ extract_seqs <-  function(folder, metadata=NULL, type = "absolute", factors=NULL
   # read profiles
   its2_profile <- extract_its2_profile(folder)
 
+
   ### absolute abundance
   absolute <- full_data
 
-
+  if(silent==FALSE){
+  cat("Number of input samples = ", length(unique(its2_profile$sample_name)), "\n")
+  }
 
 
   #columns matching "onlyprofile"
   if (isTRUE(onlyprofile)) {
     absolute <- absolute %>%
-      dplyr::filter(sample_name %in% its2_profile$sample_name)
+      dplyr::filter(full_data$sample_name %in% its2_profile$sample_name)
+
+
+    if(silent==FALSE){
+    cat("onlyprofile=TRUE\n")
+    cat("its2_profile sample_names removed:\n")
+    cat(absolute$sample_name[!(absolute$sample_name %in% its2_profile$sample_name)], sep=" | ")   # show only samples not in onlyprofile
+    }
+
   }
 
 
@@ -54,16 +71,20 @@ extract_seqs <-  function(folder, metadata=NULL, type = "absolute", factors=NULL
     tibble::rownames_to_column("sample_name") %>%
     tidyr::pivot_longer(cols = -sample_name, names_to = "seq.ID", values_to = "abundance") %>%
     dplyr::filter(abundance>0.0001) %>%
-    dplyr::mutate(seq.ID = stringr::str_replace(seq.ID, "^X", "")) %>% # drop X if first in seq.ID
-    dplyr::group_by(sample_name) |>
-    dplyr::arrange(desc(abundance))
+    dplyr::mutate(seq.ID = stringr::str_replace(seq.ID, "^X", ""))  # drop X if first in seq.ID
+
 
   relative <- relative %>%
     tibble::rownames_to_column("sample_name") %>%
     tidyr::pivot_longer(cols = -sample_name, names_to = "seq.ID", values_to = "abundance") %>%
     dplyr::filter(abundance>0.0001) %>%
-    dplyr::mutate(seq.ID = stringr::str_replace(seq.ID, "^X", "")) %>% # drop X if first in seq.ID
-    dplyr::arrange(sample_name, desc(abundance))
+    dplyr::mutate(seq.ID = stringr::str_replace(seq.ID, "^X", ""))# drop X if first in seq.ID
+
+  if (isTRUE(arrange)) {
+      absolute <- absolute %>% dplyr::group_by(sample_name) %>% dplyr::arrange(desc(abundance))
+      relative <- relative %>% dplyr::arrange(sample_name, desc(abundance))
+  }
+
 
   if (!is.null(metadata)) {
     absolute <- left_join(absolute, metadata, by="sample_name")
@@ -72,8 +93,21 @@ extract_seqs <-  function(folder, metadata=NULL, type = "absolute", factors=NULL
 
   # return functions:
   if (type == "absolute") {
+    if(silent==FALSE){
+      cat("Number of output samples = ", length(unique(absolute$sample_name)), "\n")
+    }
+    if(names==TRUE){
+      print(unique(absolute$sample_name))
+    }
+
     return(absolute)
   } else if (type == "relative") {
+    if(silent==FALSE){
+      cat("Number of input samples = ", length(unique(relative$sample_name)), "\n")
+    }
+    if(names==TRUE){
+      print(unique(absolute$sample_name))
+    }
     return(relative)
   }
 }

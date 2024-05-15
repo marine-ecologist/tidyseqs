@@ -1,53 +1,50 @@
-#' Function to extract sequences from symportal output
-#'
-#'
-#' same as extract_seqs but in long format
-#'
-#' @param input location of input file
-#' @param clade filter by single "C" or multiple clades c("C", "D") to filter sequences by
-#' @param drop_samples drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")
-#' @param keep_samples drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")
-#' @param drop_seqs drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")
-#' @param keep_seqs drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")
-#' @param keep_profiles keep only seq.ID in matching ITS2 profile
-#' @param drop_profiles keep only seq.ID in matching ITS2 profile
-#' @param threshold Set threshold to remove samples if less than the threshold (defaults to 0)
-#' @export
-#' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 
+
+#' Function to extract sequences from symportal output in long format
+#'
+#' @param input Input data.frame with seq.ID and sample_name
+#' @param folder Optional, folder containing profile information
+#' @param type "relative" or "absolute" to specify type of abundance to return
+#' @param drop_samples Vector of samples to exclude by name or pattern
+#' @param keep_samples Vector of samples to include by name or pattern
+#' @param drop_seqs Vector of sequences to exclude by name or pattern
+#' @param keep_seqs Vector of sequences to include by name or pattern
+#' @param keep_profiles Logical, whether to keep only sequences in matching ITS2 profile
+#' @param drop_profiles Logical, whether to exclude sequences in matching ITS2 profile
+#' @param random_sample_n Integer, number of random samples to select
+#' @param clade Vector of clades to filter sequences by (e.g., clade=C, clade=("C", "D"))
+#' @param threshold Numeric, threshold to remove samples with lower total abundance
+#' @param seed Optional, seed value for random sampling
+#' @param silent Print messages
+#' @export
+#' @return A data.frame of seq.ID (columns) and sample.ID (rows) with abundance
 
 
 filter_seqs <- function(input, folder=NULL, type="relative",
                         drop_samples=NULL, keep_samples=NULL,
                         drop_seqs=NULL, keep_seqs=NULL,
                         keep_profiles=FALSE, drop_profiles=FALSE,
+                        random_sample_n = NULL, silent=TRUE,
                         clade = NULL, threshold=0, ...){
 
 
-  #-------- sample_name --------#
-  # Drop
+  # Handle sample name filters
   if (!is.null(drop_samples)) {
     input <- input %>% as.data.frame() %>%
       dplyr::filter(!grepl(paste(drop_samples, collapse = "|"), sample_name))
   }
 
-  # Keep
   if (!is.null(keep_samples)) {
     input <- input %>% as.data.frame() %>%
-      dplyr::filter(grepl(paste(drop_samples, collapse = "|"), sample_name))
+      dplyr::filter(grepl(paste(keep_samples, collapse = "|"), sample_name))
   }
 
-  #-------- seq.ID --------#
-  # drop
+  # Handle sequence ID filters
   if (!is.null(drop_seqs)) {
-    input <- input %>%
-      dplyr::filter(!seq.ID %in% drop_seqs)
+    input <- dplyr::filter(input, !seq.ID %in% drop_seqs)
   }
-
-  # Keep
   if (!is.null(keep_seqs)) {
-    input <- input %>%
-      dplyr::filter(seq.ID %in% keep_seqs)
+    input <- dplyr::filter(input, seq.ID %in% keep_seqs)
   }
 
   #-------- profiles --------#
@@ -78,6 +75,20 @@ filter_seqs <- function(input, folder=NULL, type="relative",
       dplyr::filter(seq.ID %in% itsprofiles)
   }
 
+  #-------- random_sample_n --------#
+
+  if (!is.null(random_sample_n)) {
+    set.seed(seed)
+    sample_name_list <- unique(as.character(input$sample_name))
+    random_samples <- sample(sample_name_list, random_sample_n)
+    random_samples
+    set.seed(NULL)
+
+    input <- input %>%
+      dplyr::filter(sample_name %in% random_samples) |>
+      as.data.frame()
+  }
+
   #-------- clade --------#
 
   if (!is.null(clade)) {
@@ -88,35 +99,48 @@ filter_seqs <- function(input, folder=NULL, type="relative",
 
   #-------- threshold --------#
 
+   # threshold is 0 then don't remove anything
    if (!threshold==0) {
 
-    precheck <- input |>
-      dplyr::group_by(sample_name) |>
-      dplyr::summarise(total=sum(abundance, na.rm=TRUE))
 
-    if (sum(precheck$total == 1) >= 5) {
-      warning("\n
-              Filtering failed:\n
-              Filtering by an abundance threshold will only work with abundance input data, e.g. extract_seqs(type=\"relative\").\n
-              Re-extract with extract_seqs(type=\"absolute\") to filter by a threshold of sequence abundances \n \n")
-      stop()
-    }
+    # filter by abundance only works with abundance. Run a precheck to verify this is
+    # abundance data and not relative abundance:
+  { precheck <- input |>
+        dplyr::group_by(sample_name) |>
+        dplyr::summarise(total=sum(abundance, na.rm=TRUE))
 
+      if (sum(precheck$total == 1) >= 5) {
+        warning("\n
+                Filtering failed:\n
+                Filtering by an abundance threshold will only work with abundance input data, e.g. extract_seqs(type=\"relative\").\n
+                Re-extract with extract_seqs(type=\"absolute\") to filter by a threshold of sequence abundances \n \n")
+        stop()
+      }
+   }
 
+    # make a threshold list of all samples that are less than or equal the threshold
     threshold_list <- input %>%
       dplyr::group_by(sample_name) %>%
       dplyr::summarize(total_abundance = sum(abundance)) %>%
-      dplyr::filter(total_abundance < threshold)
+      dplyr::filter(total_abundance <= threshold) |>
+      dplyr::arrange(dplyr::desc(total_abundance))
 
+      if (!threshold==0 & silent==FALSE){
+        print(threshold_list)
+      }
+
+    # remove samples not in the threshold list:
     input <- input |>
       dplyr::filter(!sample_name %in% threshold_list$sample_name)
 
   }
 
   # convert to relative / absolute abundance
-  absolute <- input
+  absolute <- input %>%
+    droplevels()
 
   relative <- input %>%
+    droplevels() %>%
     dplyr::group_by(sample_name) %>%
     dplyr::mutate(total=sum(abundance, na.rm = TRUE)) %>%
     dplyr::mutate(abundance=abundance/total) %>%

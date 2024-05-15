@@ -14,6 +14,7 @@ filter_seqs(
   keep_seqs = NULL,
   keep_profiles = FALSE,
   drop_profiles = FALSE,
+  random_sample_n = NULL,
   clade = NULL,
   threshold = 0,
   ...
@@ -33,6 +34,8 @@ filter_seqs(
 \item{keep_profiles}{keep only seq.ID in matching ITS2 profile}
 
 \item{drop_profiles}{keep only seq.ID in matching ITS2 profile}
+
+\item{random_sample_n}{take a random sample of n sample_names}
 
 \item{clade}{filter by single "C" or multiple clades c("C", "D") to filter sequences by}
 

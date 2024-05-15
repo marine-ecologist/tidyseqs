@@ -11,6 +11,8 @@ extract_seqs(
   factors = NULL,
   onlyprofile = FALSE,
   remove_zero = TRUE,
+  arrange = TRUE,
+  seed = NULL,
   ...
 )
 }
@@ -22,10 +24,18 @@ extract_seqs(
 \item{type}{returns either "relative" or "absolute"}
 
 \item{factors}{option to include a vector list of column names, e.g: c("location", "latitude") to not import every column in a metadata file, if left NULL then will import all columns}
+
+\item{onlyprofile}{TRUE/FALSE return only profiles}
+
+\item{remove_zero}{drop empty rows / columns}
+
+\item{arrange}{arrange by seq.ID alphanumerically, TRUE by default}
+
+\item{seed}{value for set.seed}
 }
 \value{
 A data.frame of seq.ID (columns) and sample_name (rows) with either relative or absolute abundance of sequences.
 }
 \description{
-same as extract_seqs but in long format
+extract sequences from symportal output
 }

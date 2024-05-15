@@ -30,6 +30,7 @@ filter_seqs <- function(input, folder=NULL, type="relative",
 
   # Handle sample name filters
   if (!is.null(drop_samples)) {
+
     input <- input %>% as.data.frame() %>%
       dplyr::filter(!grepl(paste(drop_samples, collapse = "|"), sample_name))
   }
@@ -41,7 +42,9 @@ filter_seqs <- function(input, folder=NULL, type="relative",
 
   # Handle sequence ID filters
   if (!is.null(drop_seqs)) {
-    input <- dplyr::filter(input, !seq.ID %in% drop_seqs)
+    #input <- dplyr::filter(input, !seq.ID %in% drop_seqs)
+    input <- input %>% as.data.frame() %>%
+      dplyr::filter(!grepl(paste(drop_seqs, collapse = "|"), seq.ID))
 
     if (!is.null(drop_seqs) & silent==FALSE){
       print(drop_seqs, n=Inf)
@@ -49,7 +52,9 @@ filter_seqs <- function(input, folder=NULL, type="relative",
 
   }
   if (!is.null(keep_seqs)) {
-    input <- dplyr::filter(input, seq.ID %in% keep_seqs)
+    #input <- dplyr::filter(input, seq.ID %in% keep_seqs)
+    input <- input %>% as.data.frame() %>%
+      dplyr::filter(!grepl(paste(keep_seqs, collapse = "|"), seq.ID))
 
     if (!is.null(keep_seqs) & silent==FALSE){
       print(keep_seqs, n=Inf)

@@ -9,9 +9,9 @@
 #' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 
 
-plot_seqs <- function(input, folder, type = "ggplot", cluster = "none", nrow=NULL, facet = NULL, seq.order=TRUE, ...) {
+plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet = NULL, seq.order=TRUE, ...) {
 
-  folder=folder_path
+  #folder=folder_path
 
   ### update order by dissimilarity index
 

@@ -1,10 +1,15 @@
-#' compare_samples
+#' plot_seqs
 #'
+#' quick visualisation of sequences clustered by sample name either with ggplot or plotly with
+#' options to organise samples by outputs of cluster analysis for sample dissimilarity, organise
+#' sequences by relative abundance, and set the number of columns and rows for large sample sizes
 #'
-#'
-#'
-#' @param input1 first output
-#' @param input2 second output
+#' @param input input file of sequences and samples (e.g. from extract_seqs)
+#' @param type standard plots ("ggplot") or interactive plots ("plotly")
+#' @param cluster optional clustering of sample names by dissimilarity index, one of "bray-curtis", "euclidean", "jaccard", "hellinger", or default ("none")
+#' @param facet TRUE/FALSE to facet output, null by default
+#' @param ncol number of rows to facet
+#' @param seq.order TRUE/FALSE, organise stacked bars by dominant sequences (abundances)
 #' @export
 #' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 

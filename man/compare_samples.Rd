@@ -7,9 +7,9 @@
 compare_samples(input1, input2, silent = FALSE)
 }
 \arguments{
-\item{input1}{first output}
+\item{input1}{first dataframe to compare}
 
-\item{input2}{second output}
+\item{input2}{first dataframe to compare against the first}
 }
 \value{
 A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.

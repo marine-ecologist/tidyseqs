@@ -1,6 +1,6 @@
 #' Function to extract its2 profiles from Symportal
 #'
-#'.  REDUNDANT - replaced by extract_postmed_seqs()
+#'.
 #'
 #' @param folder location of the root Symportal output
 #' @param type relative or absolute

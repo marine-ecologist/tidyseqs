@@ -9,7 +9,7 @@ the current development version of `tidyseqs` can be installed from github:
 
 ``` r
 #install.packages("remotes")
-install_github("marine-ecologist/coralseed")
+remotes::install_github("marine-ecologist/tidyseqs", force=TRUE)
 
 ```
 

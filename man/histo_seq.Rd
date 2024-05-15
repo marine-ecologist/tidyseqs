@@ -2,7 +2,7 @@
 % Please edit documentation in R/histo_seq.R
 \name{histo_seq}
 \alias{histo_seq}
-\title{Test function}
+\title{Test function to rapidly plot seqs}
 \usage{
 histo_seq(folder, random = TRUE, n, seed)
 }

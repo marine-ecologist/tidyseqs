@@ -1,5 +1,5 @@
 
-#' Test function
+#' Test function to rapidly plot seqs
 #'
 #'
 #' histo_seq

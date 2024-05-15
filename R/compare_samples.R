@@ -3,8 +3,8 @@
 #'
 #'
 #'
-#' @param input1 first output
-#' @param input2 second output
+#' @param input1 first dataframe to compare
+#' @param input2 first dataframe to compare against the first
 #' @export
 #' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 

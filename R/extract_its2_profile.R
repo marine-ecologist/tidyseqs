@@ -27,7 +27,7 @@ extract_its2_profile <- function(folder, type="absolute"){
         dplyr::select(-value) %>%
         tidyr::pivot_wider(id_cols = "sample_name", names_from = "name", values_from = "name", values_fn = list(am = length)) %>%
         tidyr::unite("strings", 2:ncol(.), na.rm = TRUE, sep = "=") %>%
-        tidyr::separate(strings, paste0("ITS2_profile.", 1:5), sep = "=") %>%
+        tidyr::separate(strings, paste0("ITS2_profile_", 1:5), sep = "=") %>%
         as.data.frame() %>%
         dplyr::rename(sample_name = sample_name)
       return(its_profile)
@@ -49,7 +49,7 @@ extract_its2_profile <- function(folder, type="absolute"){
         dplyr::select(-value) %>%
         tidyr::pivot_wider(id_cols = "sample_name", names_from = "name", values_from = "name", values_fn = list(am = length)) %>%
         tidyr::unite("strings", 2:ncol(.), na.rm = TRUE, sep = "=") %>%
-        tidyr::separate(strings, paste0("ITS2_profile.", 1:5), sep = "=") %>%
+        tidyr::separate(strings, paste0("ITS2_profile_", 1:5), sep = "=") %>%
         as.data.frame() %>%
         dplyr::rename(sample_name = sample_name)
       return(its_profile)

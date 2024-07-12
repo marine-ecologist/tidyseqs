@@ -11,7 +11,7 @@
 #' @param ncol number of rows to facet
 #' @param seq.order TRUE/FALSE, organise stacked bars by dominant sequences (abundances)
 #' @export
-#' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
+#' @return A data.frame of seq_ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 
 
 plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet = NULL, seq.order=TRUE, ...) {
@@ -22,8 +22,8 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
 
   if (cluster == "bray-curtis") {
     dist_data <- input |>
-      dplyr::select(sample_name, seq.ID, abundance) |>
-      tidyr::pivot_wider(names_from = "seq.ID", values_from = "abundance") |>
+      dplyr::select(sample_name, seq_ID, abundance) |>
+      tidyr::pivot_wider(names_from = "seq_ID", values_from = "abundance") |>
       tibble::column_to_rownames("sample_name") |>
       dplyr::mutate(dplyr::across(dplyr::everything(), ~ ifelse(is.na(.), 0, .)))
 
@@ -38,8 +38,8 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
 
   if (cluster == "euclidean") {
     dist_data <- input |>
-      dplyr::select(sample_name, seq.ID, abundance) |>
-      tidyr::pivot_wider(names_from = "seq.ID", values_from = "abundance") |>
+      dplyr::select(sample_name, seq_ID, abundance) |>
+      tidyr::pivot_wider(names_from = "seq_ID", values_from = "abundance") |>
       tibble::column_to_rownames("sample_name") |>
       dplyr::mutate(dplyr::across(dplyr::everything(), ~ ifelse(is.na(.), 0, .)))
 
@@ -55,8 +55,8 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
 
   if (cluster == "jaccard") {
     dist_data <- input |>
-      dplyr::select(sample_name, seq.ID, abundance) |>
-      tidyr::pivot_wider(names_from = "seq.ID", values_from = "abundance") |>
+      dplyr::select(sample_name, seq_ID, abundance) |>
+      tidyr::pivot_wider(names_from = "seq_ID", values_from = "abundance") |>
       tibble::column_to_rownames("sample_name") |>
       dplyr::mutate(dplyr::across(dplyr::everything(), ~ ifelse(is.na(.), 0, .)))
 
@@ -72,8 +72,8 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
 
   if (cluster == "hellinger") {
     dist_data <- input |>
-      dplyr::select(sample_name, seq.ID, abundance) |>
-      tidyr::pivot_wider(names_from = "seq.ID", values_from = "abundance") |>
+      dplyr::select(sample_name, seq_ID, abundance) |>
+      tidyr::pivot_wider(names_from = "seq_ID", values_from = "abundance") |>
       tibble::column_to_rownames("sample_name") |>
       dplyr::mutate(dplyr::across(dplyr::everything(), ~ ifelse(is.na(.), 0, .)))
 
@@ -93,19 +93,19 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
 
   # get colors
   colour.seqs_new <- extract_plot_colors(folder)
-  #filtered_color_list <- color_list[names(color_list) %in% input$seq.ID]
+  #filtered_color_list <- color_list[names(color_list) %in% input$seq_ID]
 
   dominant.seqs <-  input %>%
-    group_by(seq.ID) %>%
+    group_by(seq_ID) %>%
     summarize(max_abundance = max(abundance)) %>%
     arrange(desc(max_abundance)) %>%
-    pull(seq.ID)
+    pull(seq_ID)
 
   if(seq.order==TRUE){
     p <-
       ggplot2::ggplot(
         data = input,
-        ggplot2::aes(x = sample_name, y = abundance, fill = factor(seq.ID, levels=dominant.seqs), group = factor(seq.ID, levels=dominant.seqs))
+        ggplot2::aes(x = sample_name, y = abundance, fill = factor(seq_ID, levels=dominant.seqs), group = factor(seq_ID, levels=dominant.seqs))
              ) +
       ggplot2::scale_y_reverse()
 
@@ -116,7 +116,7 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
   p <-
     ggplot2::ggplot(
       data = input,
-      ggplot2::aes(x = sample_name, y = abundance, fill = seq.ID, group = abundance)
+      ggplot2::aes(x = sample_name, y = abundance, fill = seq_ID, group = abundance)
     )
   }
 
@@ -134,7 +134,7 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
 #     p <-
 #       ggplot2::ggplot(
 #         data = input,
-#         ggplot2::aes(x =  reorder(sample_name, {{order}}), y = abundance, fill = seq.ID, group = abundance)
+#         ggplot2::aes(x =  reorder(sample_name, {{order}}), y = abundance, fill = seq_ID, group = abundance)
 #       ) +
 #       ggplot2::theme_bw() +
 #       ggplot2::geom_bar(color = "black", linewidth = 0.1, show.legend = FALSE, stat = "identity") +
@@ -169,7 +169,7 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
         p <-
           ggplot2::ggplot(
             data = input,
-            ggplot2::aes(x = sample_name, y = abundance, fill = factor(seq.ID, levels=dominant.seqs), group = factor(seq.ID, levels=dominant.seqs))
+            ggplot2::aes(x = sample_name, y = abundance, fill = factor(seq_ID, levels=dominant.seqs), group = factor(seq_ID, levels=dominant.seqs))
           ) +
           ggplot2::scale_y_reverse()
 
@@ -180,7 +180,7 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
       p <-
         ggplot2::ggplot(
           data = input,
-          ggplot2::aes(x = sample_name, y = abundance, fill = seq.ID, group = abundance)
+          ggplot2::aes(x = sample_name, y = abundance, fill = seq_ID, group = abundance)
         )
     }
 

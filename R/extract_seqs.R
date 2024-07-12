@@ -8,11 +8,11 @@
 #' @param metadata location of a metadata file in csv, must contain a column called sample_name with matches
 #' @param factors option to include a vector list of column names, e.g: c("location", "latitude") to not import every column in a metadata file, if left NULL then will import all columns
 #' @param onlyprofile TRUE/FALSE return only profiles
-#' @param arrange arrange by seq.ID alphanumerically, TRUE by default
+#' @param arrange arrange by seq_ID alphanumerically, TRUE by default
 #' @param silent print summary statistics, FALSE by default
 #' @param names print names list, FALSE by default
 #' @export
-#' @return A data.frame of seq.ID (columns) and sample_name (rows) with either relative or absolute abundance of sequences.
+#' @return A data.frame of seq_ID (columns) and sample_name (rows) with either relative or absolute abundance of sequences.
 
 
 extract_seqs <-  function(folder, metadata=NULL, type = "absolute",
@@ -75,16 +75,16 @@ extract_seqs <-  function(folder, metadata=NULL, type = "absolute",
   # pivot
   absolute <- absolute %>%
     tibble::rownames_to_column("sample_name") %>%
-    tidyr::pivot_longer(cols = -sample_name, names_to = "seq.ID", values_to = "abundance") %>%
+    tidyr::pivot_longer(cols = -sample_name, names_to = "seq_ID", values_to = "abundance") %>%
     dplyr::filter(abundance>0.0001) %>%
-    dplyr::mutate(seq.ID = stringr::str_replace(seq.ID, "^X", ""))  # drop X if first in seq.ID
+    dplyr::mutate(seq_ID = stringr::str_replace(seq_ID, "^X", ""))  # drop X if first in seq_ID
 
 
   relative <- relative %>%
     tibble::rownames_to_column("sample_name") %>%
-    tidyr::pivot_longer(cols = -sample_name, names_to = "seq.ID", values_to = "abundance") %>%
+    tidyr::pivot_longer(cols = -sample_name, names_to = "seq_ID", values_to = "abundance") %>%
     dplyr::filter(abundance>0.0001) %>%
-    dplyr::mutate(seq.ID = stringr::str_replace(seq.ID, "^X", ""))# drop X if first in seq.ID
+    dplyr::mutate(seq_ID = stringr::str_replace(seq_ID, "^X", ""))# drop X if first in seq_ID
 
   if (isTRUE(arrange)) {
       absolute <- absolute %>% dplyr::group_by(sample_name) %>% dplyr::arrange(desc(abundance))
